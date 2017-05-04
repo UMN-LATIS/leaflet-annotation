@@ -346,7 +346,8 @@ $(document).ready(function () {
                     snapToLatLng()
                 })
             },
-            onHide: function(evt){ //update view on close (even though it's updated everytime a field is changed and this code will theoretically never run)
+            onHide: function(evt){
+                //update view on close (even though it's updated every time a field is changed and this code will theoretically never run)
                 var x = document.getElementById("x-field").value
                 var y = document.getElementById("y-field").value
                 var zoom = document.getElementById("zoom-field").value
@@ -559,8 +560,8 @@ $(document).ready(function () {
 
             content: '<br> \
 					<a id="download_button"><button class="btn btn-primary btn-md btn-block">Download JSON</button></a> \
-					<label class="btn btn-secondary btn-md btn-block"> \
-    									Upload <input type="file" id="json_file" style="display: none;"> \
+					<label for="json_file" class="btn btn-secondary btn-md btn-block"> Upload \
+    				<input type="file" id="json_file" style="display:none;"> \
 					</label>',
             closeTitle: 'close',                 // alt title of the close button
             zIndex: 10000,                       // needs to stay on top of the things
@@ -591,7 +592,6 @@ $(document).ready(function () {
                     fr.onload = function(e) {
                         var result = JSON.parse(e.target.result)
                         var formatted = JSON.stringify(result, null, 2)
-                        document.getElementById('json_field').value = formatted
                         setJsonData(result)
                     }
 
