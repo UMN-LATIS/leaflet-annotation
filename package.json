@@ -1,0 +1,21 @@
+{
+  "name": "UMNMedicalSchoolApp",
+  "version": "1.0.0",
+  "description": "Leaflet application for UMN Medical School",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Jeremy Herzog",
+  "license": "ISC",
+  "dependencies": {
+    "leaflet": "^1.0.3",
+    "leaflet-arrows": "^1.0.0",
+    "leaflet-draw": "^0.4.9",
+    "leaflet-easybutton": "^2.2.0",
+    "leaflet-fullscreen": "^1.0.2",
+    "leaflet-measure": "https://github.com/UMN-LATIS/leaflet-measure/tarball/master",
+    "leaflet-modal": "^0.1.3",
+    "leaflet-tooltip": "^1.0.2"
+  }
+}

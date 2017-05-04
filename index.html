@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>App</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" >
+    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <!--<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>-->
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+        <![endif]-->
+
+    <script src="node_modules/leaflet/dist/leaflet.js"></script>
+    <script src="node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js"></script>
+    <script src="Leaflet.elevator.js"></script>
+    <!-- Bootstrap JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="node_modules/leaflet-minimap/dist/Control.MiniMap.min.js"></script>
+    <script src="node_modules/leaflet-measure/dist/leaflet-measure.js"></script>
+
+    <script src="node_modules/leaflet-tooltip/dist/L.Tooltip.js"></script>
+
+    <script src="node_modules/leaflet-easybutton/src/easy-button.js"></script>
+
+    <script src="node_modules/leaflet-arrows/leaflet-arrows.js"></script>
+
+    <script src="node_modules/leaflet-modal/dist/Leaflet.Modal.js"></script>
+
+    <script src="node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+
+    <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css" />
+    <link rel="stylesheet" href="node_modules/leaflet-measure/dist/leaflet-measure.css" />
+    <!--<link rel="stylesheet" href="node_modules/leaflet-measure/bower_components/normalize.css/normalize.css" />-->
+    <link rel="stylesheet" href="node_modules/leaflet-easybutton/src/easy-button.css" />
+    <link rel="stylesheet" href="node_modules/leaflet-tooltip/dist/tooltip.css" />
+    <link rel="stylesheet" href="node_modules/leaflet-modal/dist/leaflet.modal.css?12345" />
+    <link rel="stylesheet" href="node_modules/leaflet-draw/dist/leaflet.draw.css?12345"/>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <!--<script src="Hello World"></script>-->
+    <style>
+        .leaflet-tile-container { -webkit-filter: brightness(0.5); filter: brightness(1) contrast(100%); }
+        .contrast {
+            -webkit-filter: contrast(180%);
+            filter: contrast(180%);
+        }
+
+        .leaflet-modal.show .overlay {
+            opacity: 0.0
+        }
+    </style>
+</head>
+<body>
+<div style="height: 800px; width:800px;">
+    <div style="height:100%; width:100%" id="map"></div>
+</div>
+
+<br>
+
+<div style="width:800px;">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="input-group">
+		      <span class="input-group-btn">
+		        <button class="btn btn-default" title="Add Scene" type="button" id="add_scene_button"><i class="glyphicon glyphicon-floppy-disk"></i></button>
+		      </span>
+                <input type="text" class="form-control" id="scene_name_input" placeholder="Scene Name">
+            </div>
+            <br>
+            <form id="scene_tags">
+                <i class="glyphicon glyphicon-chevron-down" scene="current_scene"></i> Current Scene
+                <div id="current_scene_info"></div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+<script type="application/javascript" src="main.js?12345"></script>
