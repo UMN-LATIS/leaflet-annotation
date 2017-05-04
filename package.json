@@ -18,5 +18,9 @@
     "leaflet-minimap": "https://github.com/UMN-LATIS/Leaflet-MiniMap/tarball/master",
     "leaflet-modal": "^0.1.3",
     "leaflet-tooltip": "^1.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/UMN-LATIS/leaflet-annotation.git"
   }
 }
