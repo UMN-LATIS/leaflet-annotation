@@ -506,10 +506,10 @@ $(document).ready(function () {
 
     function loadScenes (scenes) {
         //load scenes at the bottom of the page
-        document.getElementById("scene_tags").innerHTML = ' \
-		<i class="glyphicon glyphicon-chevron-down" scene="current_scene" state="hide"></i> Current Scene \
-		<div id="current_scene_info"></div> \
-		'
+  //       document.getElementById("scene_tags").innerHTML = ' \
+		// <i class="glyphicon glyphicon-chevron-down" scene="current_scene" state="hide"></i> Current Scene \
+		// <div id="current_scene_info"></div> \
+		// '
         for (var key in scenes) {
             appendSceneTag(key)
         }
@@ -559,8 +559,8 @@ $(document).ready(function () {
         map.fire('modal', {
 
             content: '<br> \
-					<a id="download_button"><button class="btn btn-primary btn-md btn-block">Download JSON</button></a> \
-					<label for="json_file" class="btn btn-secondary btn-md btn-block"> Upload \
+					<a id="download_button"><button class="btn btn-primary btn-md btn-block">Download Scenes</button></a> \
+					<label for="json_file" class="btn btn-secondary btn-md btn-block"> Upload Scenes \
     				<input type="file" id="json_file" style="display:none;"> \
 					</label>',
             closeTitle: 'close',                 // alt title of the close button
@@ -652,7 +652,6 @@ $(document).ready(function () {
         //set current scene informations
         var sceneName = this.value
         var selectedScene = mapJson.scenes[sceneName]
-
         document.getElementById("scene_name_input").value = sceneName
 
         mapJson.brightness = selectedScene.brightness
@@ -714,6 +713,51 @@ $(document).ready(function () {
         sceneDiv.className = "" //clear box
     })
 
+    var redrawContents = function(sceneName) {
+
+        var sceneDiv = document.getElementById(sceneName + "_info")
+        sceneDiv.innerHTML = "" //clear html string in scene's info div
+        sceneDiv.className = "" //clear box
+        sceneDiv.className = "panel panel-default"
+
+        var sceneInfo = document.createElement("div")
+        sceneInfo.className = "panel-body"
+
+        $(this).attr("class", "glyphicon glyphicon-chevron-up") //replace with an up arrow
+        //$(this).attr("state", "show")
+        if (sceneName == "current_scene") {
+            var scene = mapJson
+        } else {
+            var scene = mapJson.scenes[sceneName] //scene now points to an object inside of scenes
+        }
+
+        var brightnessInfo = "brightness: " + scene.brightness + "<br>"
+        sceneInfo.insertAdjacentHTML('beforeend', brightnessInfo)
+
+        var contrastInfo = "contrast: " + scene.contrast + "<br>"
+        sceneInfo.insertAdjacentHTML('beforeend', contrastInfo)
+
+        scene.arrows.forEach(function(arrow) {
+            var arrowHtml = '<i class="glyphicon glyphicon-remove" scene="' + sceneName + '" leaflet_id="' + arrow.leaflet_id + '" type="arrow"></i> ' + arrow.color + ' arrow <br>'
+            sceneInfo.insertAdjacentHTML('beforeend', arrowHtml)
+        })
+
+        scene.annotations.forEach(function(annotation) {
+            var annotationHtml = '<i class="glyphicon glyphicon-remove" scene="' + sceneName + '" leaflet_id="' + annotation.leaflet_id + '" type="annotation"></i> ' + annotation.text + '<br>'
+            sceneInfo.insertAdjacentHTML('beforeend', annotationHtml)
+        })
+
+        scene.shapes.forEach(function(shape) {
+            var annotationHtml = '<i class="glyphicon glyphicon-remove" scene="' + sceneName + '" leaflet_id="' + shape.leaflet_id + '" type="shape"></i> ' + shape.color + ' ' + shape.type + '<br>'
+            sceneInfo.insertAdjacentHTML('beforeend', annotationHtml)
+        })
+
+        sceneDiv.appendChild(sceneInfo)
+
+
+    };
+
+
     $(document).on("click", ".glyphicon-remove", function() {
         //First, find the scene to delete from
         var sceneName = $(this).attr("scene")
@@ -767,7 +811,14 @@ $(document).ready(function () {
             'shapes': $.extend(true, [], mapJson.shapes),
         }
 
+        $('input[name=scene_radio][value=' + sceneName + ']').prop('checked',true);
+        $('input[name=scene_radio][value=' + sceneName + ']').trigger('change');
+        console.log($("i[scene=" + sceneName + "]"));
+        if($("i[scene=" + sceneName + "]").hasClass("glyphicon-chevron-up")) {
+            redrawContents(sceneName);
+        }
+        
         console.log(mapJson)
-        sceneInput.value = ""
+        // sceneInput.value = ""
     })
 })
