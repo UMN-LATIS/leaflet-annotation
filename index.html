@@ -9,7 +9,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="bootstrap-theme.min.css" >
-    <link rel="stylesheet" href="node_modules/leaflet/dist/leaflet.css">
+    <link rel="stylesheet" href="Leaflet/leaflet.css">
     <link rel="stylesheet" href="node_modules/leaflet-fullscreen/dist/leaflet.fullscreen.css">
     <script src="jquery.min.js"></script>
     <!--<script   src="https://code.jquery.com/jquery-3.1.1.min.js"   integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="   crossorigin="anonymous"></script>-->
@@ -20,7 +20,7 @@
         <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
         <![endif]-->
 
-    <script src="node_modules/leaflet/dist/leaflet.js"></script>
+    <script src="Leaflet/leaflet-src.js"></script>
     <script src="node_modules/leaflet-fullscreen/dist/Leaflet.fullscreen.js"></script>
     <script src="Leaflet.elevator.js"></script>
     <!-- Bootstrap JavaScript -->
@@ -37,6 +37,7 @@
     <script src="node_modules/leaflet-modal/dist/Leaflet.Modal.js"></script>
 
     <script src="node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="leaflet-annotate.js"></script>
 
     <link rel="stylesheet" href="node_modules/leaflet-minimap/dist/Control.MiniMap.min.css" />
     <link rel="stylesheet" href="node_modules/leaflet-measure/dist/leaflet-measure.css" />
@@ -48,8 +49,42 @@
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
     <!--<script src="Hello World"></script>-->
     <style>
-        .leaflet-tile-container { -webkit-filter: brightness(0.5); filter: brightness(1) contrast(100%); }
-        .contrast {
+
+.leaflet-top {
+    z-index: 400;
+}
+
+.form-control1 {
+    width: 100%;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+    -webkit-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s
+
+}
+.fullscreenImageContainer {
+    max-height: 100%;
+    height: 100%;
+}
+.fixedHeightContainer {
+    height: calc(100% - 120px);
+    max-height: 100%
+}
+.outerContainerForFirefox {
+    height: 100%;
+}
+
+ .contrast {
             -webkit-filter: contrast(180%);
             filter: contrast(180%);
         }
@@ -57,23 +92,28 @@
         .leaflet-modal.show .overlay {
             opacity: 0.0
         }
+
+        .fileOptionButton {
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
     </style>
 </head>
 <body>
 <div style="height: 800px; width:800px;">
     <div style="height:100%; width:100%" id="map"></div>
 </div>
-
-<br>
-
 <div style="width:800px;">
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="input-group">
-		      <span class="input-group-btn">
-		        <button class="btn btn-default" title="Add Scene" type="button" id="add_scene_button"><i class="glyphicon glyphicon-floppy-disk"></i></button>
-		      </span>
-                <input type="text" class="form-control" id="scene_name_input" placeholder="Scene Name">
+              <span class="input-group-btn">
+                <button class="btn btn-default" title="Add Scene" type="button" id="add_scene_button"><i class="glyphicon glyphicon-floppy-disk"></i></button>
+              </span>
+                <input type="text" class="form-control1" id="scene_name_input" placeholder="Scene Name">
+                <span class="input-group-btn">
+                <button class="btn btn-default" title="Clear" type="button" id="clear_current_scene_button"><i class="glyphicon glyphicon-remove-circle"></i></button>
+              </span>
             </div>
             <br>
             <form id="scene_tags">
@@ -82,6 +122,156 @@
         </div>
     </div>
 </div>
+
+
+<br>
+
 </body>
 </html>
-<script type="application/javascript" src="main.js?12345"></script>
+
+<script type="application/javascript" src="main.js?12345f4fff"></script>
+<script type="application/javascript">
+
+    var map;
+    var s3;
+    var AWS;
+    var pixelsPerMillimeter = null;
+    // var pixelsPerMillimeter = <?=((isset($widgetObject->sidecars) && array_key_exists("ppm", $widgetObject->sidecars) && strlen($widgetObject->sidecars['ppm'])>0))?$widgetObject->sidecars['ppm']:0?>;
+    var layer;
+
+    var saveURL = "";
+    var canSave = false;
+    
+    canSave = true;
+
+    var sideCar = null;
+    // <?if(isset($widgetObject->sidecars) && array_key_exists("svs", $widgetObject->sidecars)):?>
+    // sideCar = <?=json_encode($widgetObject->sidecars['svs'])?>;
+    // <?endif?>
+
+    var mapOptions = {
+            width: 16000,
+            height: 22988,
+            tileSize :254,
+            detectRetina: false,
+            maxNativeZoom: 16 - 1,
+            maxZoom: 16 + 5,
+            overlap: 1,
+            pixelsPerMillimeter: pixelsPerMillimeter,
+            lineColor: 'blue'
+        };
+
+    var elevatorLoadFunction = function(coords, tile, done) {
+            var error;
+
+            var params = {Bucket: 'elevator-assets', Key: "testasset4/tiledBase_files/" + coords.z + "/" + coords.x + "_" + coords.y + ".jpeg"};
+            tile.onload = (function(done, error, tile) {
+         return function() {
+             done(error, tile);
+         }
+     })(done, error, tile);
+            tile.src = "https://s3.amazonaws.com/" + params.Bucket + "/" + params.Key;
+            
+            return tile;
+
+        }
+
+    var loadedCallback = function() {
+
+
+        map = L.map('map', {
+            fullscreenControl: true,
+            zoomSnap: 0,
+            drawControl: true,
+            detectRetina: false,
+            layers: [],
+            keyboard: false,
+            crs: L.CRS.Simple //Set a flat projection, as we are projecting an image
+         }).setView([0, 0], 0);
+
+
+
+
+        layer = L.tileLayer.elevator(elevatorLoadFunction, mapOptions);
+        layer.addTo(map);
+
+        var minimapRatio = 16000 / 22988;
+        if(minimapRatio > 4 || minimapRatio < 1) {
+            minimapRatio = 1;
+        }
+
+        if(minimapRatio > 1) {
+            heightScale = 1/minimapRatio;
+            widthScale = 1;
+        }
+        else {
+            heightScale = 1;
+            widthScale = minimapRatio;
+        }
+        var miniLayer = L.tileLayer.elevator(elevatorLoadFunction, mapOptions);
+
+        var miniMap = new L.Control.MiniMap(miniLayer, {
+            width: 140 * widthScale,
+            height: 140 * heightScale,
+                        //position: "topright",
+                        toggleDisplay: true,
+                        zoomAnimation: false,
+                        zoomLevelOffset: -3,
+                        zoomLevelFixed: -3
+                    });
+        miniMap.addTo(map);
+
+        if(pixelsPerMillimeter > 10) {
+
+            var measureControl = new L.Control.Measure(
+            {
+                units: {
+                    m: {
+                        factor: (1 / pixelsPerMillimeter) / 1000, //calculateConversionFactor() returns a conversion ratio in terms of millimeters
+                        display: 'meters',
+                        decimals: 2
+                    },
+                    cm: {
+                        factor: (1 / pixelsPerMillimeter) / 10,
+                        display: 'centimeters',
+                        decimals: 2
+                    },
+                    sqm: {
+                      //factor: conversionFactor(44568, 20000) / 50000,
+                      factor: (1 /  Math.pow(pixelsPerMillimeter,2)) / 1000000,
+                      display: 'square meters',
+                      decimals: 2
+                  },
+                  sqcm: {
+                      //factor: conversionFactor(44568, 20000) / 500,
+                      factor: (1 / Math.pow(pixelsPerMillimeter,2)) / 100,
+                      display: 'square centimeters',
+                      decimals: 2
+                  }
+              },
+              primaryLengthUnit: 'cm',
+              secondaryLengthUnit: 'pixels',
+              primaryAreaUnit: 'sqcm',
+              secondaryAreaUnit: 'sqm'
+            });
+
+        measureControl.addTo(map);
+
+        }
+
+
+        sideCar = {"brightness":50,"contrast":100,"arrows":[{"leaflet_id":95,"latlng":{"lat":-0.2078306579589843,"lng":0.13329223632812495},"degree":99.02916857838113,"distance":11.782480523392131,"color":"blue","angle":99.02916857838113}],"annotations":[],"shapes":[],"scenes":{"test":{"brightness":50,"contrast":100,"arrows":[],"annotations":[],"shapes":[]},"test2":{"brightness":50,"contrast":100,"arrows":[{"leaflet_id":95,"latlng":{"lat":-0.2078306579589843,"lng":0.13329223632812495},"degree":99.02916857838113,"distance":11.782480523392131,"color":"blue"}],"annotations":[],"shapes":[]}}};
+        // var annotation = new LAnnotation(map, {});
+        // annotation.loadInterface();
+        // loadAnnotation(sideCar);
+        console.log(map.options);
+        leafletAnnotate = new LAnnotate(map, {magnification: 20, layerOptions: mapOptions, saveURL: "/test"});
+    };
+
+var leafletAnnotate = null;
+loadedCallback(); 
+
+
+
+
+</script>
